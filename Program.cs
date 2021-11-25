@@ -133,33 +133,33 @@ namespace TextJson
 
             WriteLine($"Cold.Low={temperatureRangesArray["Cold"].Low}, Hot.High={temperatureRangesArray["Hot"].High}");
 
-            // JsonNode root = forecastNode.Root;
-            // JsonArray temperatureRangesArray = root["TemperatureRanges"].AsArray();
-            // int count = temperatureRangesArray.Count;
-            // int sum = default;
-            // foreach (JsonNode temperature in temperatureRangesArray)
-            // {
-            //     if (temperature["High"] is JsonNode coldHigh)
-            //     {
-            //         sum += (int)coldHigh;
-            //     }
-            //     else if (temperature["Low"] is JsonNode coldLow)
-            //     {
-            //         sum+= (int)coldLow;
-            //     }
-            // }
-            // WriteLine($"Sum:{sum}");
+            
+            jsonString = File.ReadAllText("ShapeList.json");
+            // Create a JsonNode DOM from a JSON string.
+
+            JsonNode shapeNode = JsonNode.Parse(jsonString);
+
+            JsonNode root = shapeNode.Root;
+            JsonArray shapeArray = root["Shapes"].AsArray();
+            int count = shapeArray.Count;
+            foreach (JsonNode shape in shapeArray)
+             {
+                 var shapeJsonString = shape.ToJsonString();
+                 WriteLine($"Forma recuperada:{shapeJsonString}");
+                 new Program().Deserialize(shapeJsonString);
+             }
 
             //new Program().Shapes();
-            new Program().Serialize(new Circle(3));
-            new Program().Serialize(new Rectangle(3,4));
-            new Program().Serialize(new Square(2,2));
-            new Program().Serialize(new Triangle(2,3));
+            new FileShapesSource().SetShapesToSource(new FileShapesSource().BuildFileNameOfShape(new Circle(3)     ),new Program().Serialize(new Circle(3)     ) );
+            new FileShapesSource().SetShapesToSource(new FileShapesSource().BuildFileNameOfShape(new Rectangle(3,4)),new Program().Serialize(new Rectangle(3,4)) );
+            new FileShapesSource().SetShapesToSource(new FileShapesSource().BuildFileNameOfShape(new Square(2,2)   ),new Program().Serialize(new Square(2,2)   ) );
+            new FileShapesSource().SetShapesToSource(new FileShapesSource().BuildFileNameOfShape(new Triangle(2,3) ),new Program().Serialize(new Triangle(2,3) ) );
 
-            new Program().Deserialize("Circle.json");
-            new Program().Deserialize("Rectangle.json");
-            new Program().Deserialize("Square.json");
-            new Program().Deserialize("Triangle.json");
+
+            new Program().Deserialize(new FileShapesSource().GetShapesFromSource("Circle.json"));
+            new Program().Deserialize(new FileShapesSource().GetShapesFromSource("Rectangle.json"));
+            new Program().Deserialize(new FileShapesSource().GetShapesFromSource("Square.json"));
+            new Program().Deserialize(new FileShapesSource().GetShapesFromSource("Triangle.json"));
 
         }
 
@@ -194,26 +194,16 @@ namespace TextJson
             Console.WriteLine($"Average grade : {average}");
         }
 
-        public void Serialize(Shape shape)
+        public string Serialize(Shape shape)
         {
-            string fileName = default;
-            if (shape.Name.IndexOf(".") != -1)
-                fileName = shape.Name.Substring(shape.Name.IndexOf(".") + 1);
-            else
-                fileName = shape.Name;
-
             var serializeOptions = new JsonSerializerOptions();
             serializeOptions.Converters.Add(new ShapeConverterWithTypeDiscriminator());
-            string jsonString = JsonSerializer.Serialize(shape, serializeOptions);
-            fileName = $"{fileName}.json";
-            File.WriteAllText(fileName, jsonString);
-
+            return  JsonSerializer.Serialize(shape, serializeOptions);
         }
-        public IShape Deserialize(string fileName)
+        public IShape Deserialize(string shapeString)
         {
-            string shapeString = new FileShapesSource().GetShapesFromSource(fileName);
-            IShape shape = new JsonSerializerShapes().GetShapesFromJsonString(shapeString);
-            return shape;
+            
+            return new JsonSerializerShapes().GetShapesFromJsonString(shapeString);
         }
     }
 

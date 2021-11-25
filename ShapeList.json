@@ -1,0 +1,27 @@
+{
+    "Shapes": [
+        {
+            "TypeDiscriminator": 1,
+            "Radius": 3,
+            "Name": "TextJson.Circle"
+        },
+        {
+            "TypeDiscriminator": 2,
+            "Length": 3,
+            "Height": 4,
+            "Name": "TextJson.Rectangle"
+        },
+        {
+            "TypeDiscriminator": 3,
+            "Length": 2,
+            "Height": 2,
+            "Name": "TextJson.Square"
+        },
+        {
+            "TypeDiscriminator": 4,
+            "Width": 2,
+            "Height": 3,
+            "Name": "TextJson.Triangle"
+        }
+    ]
+}
